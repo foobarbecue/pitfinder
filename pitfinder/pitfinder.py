@@ -36,6 +36,9 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
         et = EllipsoidTool() # Why is this a class?
         center, radii, rotation = et.getMinVolEllipse(pit_cloud_mat[:, :3], tolerance=0.1)
         print("{}, {}, {}".format(center, radii, rotation))
+        with open(cloud[:-4] + 'elps.txt', 'w') as ellipse_file:
+            ellipse_file.write('Center: {} \nRadii: {} \nRotation matrix: {}'
+                               .format(center, radii, rotation))
 
         # ctr, radii, evecs, v = ellipsoid_fit(pit_cloud_mat)
 
