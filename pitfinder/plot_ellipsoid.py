@@ -10,7 +10,6 @@ if __name__=='__main__':
     data_regd = data_regularize(data[:, :3], divs=16)
 
     center, radii, evecs, v = ellipsoid_fit(data_regd)
-    dataC2 = data_regd - center.T
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -24,10 +23,10 @@ if __name__=='__main__':
             ax.plot([point[0]], [point[1]], [point[2]], 'w')
             
     #ax.scatter(dataC[:,0], dataC[:,1], dataC[:,2], marker='o', color='g')
-    ax.scatter(dataC2[:, 0], dataC2[:, 1], dataC2[:, 2], marker='o', color='b')
+    ax.scatter(data_regd[:, 0], data_regd[:, 1], data_regd[:, 2], marker='o', color='b')
     # ax.scatter(dataE[:, 0], dataE[:, 1], dataE[:, 2], marker='o', color='r')
 
-    ellipsoid_plot([0, 0, 0], radii, evecs, ax=ax, plotAxes=True, cageColor='g')
+    ellipsoid_plot(center.T[0], radii, evecs, ax=ax, plotAxes=True, cageColor='g')
 
     plt.show()
 
