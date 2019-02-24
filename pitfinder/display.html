@@ -6,6 +6,7 @@
     <title>fitpit </title>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/100/three.js"></script>
     <script type="text/javascript" src="./PLYLoader.js"></script>
+    <script type="text/javascript" src="./OrbitControls.js"></script>
 
     <style>
         body {
@@ -32,9 +33,12 @@
 
 			// create a scene, that will hold all our elements such as objects, cameras and lights.
 			var scene = new THREE.Scene();
+			window.scene = scene;
 
 			// create a camera, which defines where we're looking at.
 			var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+			var controls = new THREE.OrbitControls( camera );
 
 			// create a render and set the size
 			var webGLRenderer = new THREE.WebGLRenderer();
@@ -48,9 +52,9 @@
 			camera.lookAt(new THREE.Vector3(0, -2, 0));
 
 			// add spotlight for the shadows
-			var spotLight = new THREE.SpotLight(0xffffff);
-			spotLight.position.set(20, 20, 20);
-			scene.add(spotLight);
+			var ambLight = new THREE.HemisphereLight(0xffffff,0xff0000,1);
+			ambLight.position.set(20,20,20);
+			scene.add(ambLight);
 
 			// add the output of the renderer to the html element
 			document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
@@ -60,11 +64,11 @@
 			var meteorite = new THREE.Object3D();
 			loader.load("../meshes/canyon_diablo_quads.ply", function (geometry) {
 				var material = new THREE.MeshStandardMaterial({
-					color: 0xffffff
+                  color: 0xffffff,
 				});
 
 				meteorite = new THREE.Mesh(geometry, material);
-
+                meteorite.name = 'meteorite';
 				scene.add(meteorite);
 			});
 
@@ -72,14 +76,18 @@
 			render();
 
 			var sphere_geom = new THREE.SphereGeometry(1,12, 12);
-			var sphere = new THREE.Mesh(sphere_geom, new THREE.MeshStandardMaterial({color:'red'}));
-			sphere.applyMatrix3(new THREE.Matrix4(-0.41299575,-0.88646136,-0.20885585, 0,
-				0.26895425,0.10038518,-0.95790732, 0,
-				0.87011386,-0.45178432,0.19695889, 0,
-                0, 0, 0
-            ));
-			sphere.position.set(-0.71474743, -0.78821992, -0.17650585);
-			sphere.scale.set(0.18781831, 0.37919495, 0.75392388);
+			var sphere = new THREE.Mesh(sphere_geom, new THREE.MeshStandardMaterial({
+              color:'red',
+              wireframe: true
+            }));
+            var rotation = new THREE.Matrix4();
+            rotation.set(   -0.38306904,-0.30257626,0.87275754,    0,
+						 0.13307275,0.91689682,0.37628694,    0,
+						 -0.91408411,0.26028412,-0.31097013,    0,
+							0, 0, 0);
+			sphere.applyMatrix(rotation);
+			sphere.position.set(0.65582235, 1.36944963, 0.61187177);
+			sphere.scale.set(0.35436503, 0.44333685, 0.64841519);
 			scene.add(sphere);
 
 
@@ -89,6 +97,7 @@
 
 					// render using requestAnimationFrame
 					requestAnimationFrame(render);
+					controls.update();
 					webGLRenderer.render(scene, camera);
 				}
 			}

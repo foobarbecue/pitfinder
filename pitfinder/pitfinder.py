@@ -3,7 +3,6 @@ from os import path, chdir
 import subprocess
 from glob import glob
 import numpy as np
-from ellipsoid import EllipsoidTool
 
 cc_exec_path = 'C:\\Users\\aaron\\CloudCompareProjects\\CloudCompare_debug\\CloudCompare.exe'
 
@@ -33,8 +32,9 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
     pit_clouds = glob(path.join(filepath, filename[:-4] + '*vertices*.asc'))
     for cloud in pit_clouds:
         pit_cloud_mat = np.loadtxt(cloud)
-        et = EllipsoidTool() # Why is this a class?
-        center, radii, rotation = et.getMinVolEllipse(pit_cloud_mat[:, :3], tolerance=0.1)
+        # et = EllipsoidTool() # Why is this a class?
+        # center, radii, rotation = et.getMinVolEllipse(pit_cloud_mat[:, :3], tolerance=0.1)
+
         print("{}, {}, {}".format(center, radii, rotation))
         with open(cloud[:-4] + 'elps.txt', 'w') as ellipse_file:
             ellipse_file.write('Center: {} \nRadii: {} \nRotation matrix: {}'
