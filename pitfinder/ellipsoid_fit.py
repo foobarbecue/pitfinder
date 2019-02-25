@@ -1,5 +1,5 @@
 import numpy as np
-https://github.com/aleksandrbazhin/ellipsoid_fit_python
+# https://github.com/aleksandrbazhin/ellipsoid_fit_python
 
 def data_regularize(data, type="spheric", divs=10):
     limits = np.array([

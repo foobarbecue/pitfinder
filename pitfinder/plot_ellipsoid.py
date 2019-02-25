@@ -13,7 +13,7 @@ if __name__=='__main__':
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    
+
 
     #hack  for equal axes
     ax.set_aspect('equal')
