@@ -80,14 +80,9 @@
               color:'red',
               wireframe: true
             }));
-            var rotation = new THREE.Matrix4();
-            rotation.set(   -0.38306904,-0.30257626,0.87275754,    0,
-						 0.13307275,0.91689682,0.37628694,    0,
-						 -0.91408411,0.26028412,-0.31097013,    0,
-							0, 0, 0);
-			sphere.applyMatrix(rotation);
-			sphere.position.set(0.65582235, 1.36944963, 0.61187177);
-			sphere.scale.set(0.35436503, 0.44333685, 0.64841519);
+			sphere.setRotationFromEuler(new THREE.Euler(0.20626, 0.75844, 1.32360, 'XYZ'));
+			sphere.position.set(0.62965989,  1.44343157,  0.63878376);
+			sphere.scale.set(0.32988549,  0.56224806,  0.42884099);
 			scene.add(sphere);
 
 
