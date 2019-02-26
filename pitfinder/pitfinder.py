@@ -1,10 +1,12 @@
 from clize import run
-from os import path, chdir
+from os import path, makedirs
 import subprocess
 from glob import glob
 import numpy as np
 import json
+import shutil
 import math
+from datetime import datetime
 from ellipsoid_fit import ellipsoid_fit, data_regularize
 
 cc_exec_path = 'C:\\Users\\aaron\\CloudCompareProjects\\CloudCompare_debug\\CloudCompare.exe'
@@ -27,11 +29,18 @@ def rotationMatrixToEulerAngles(R):
 
 
 def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
-              filename='canyon_diablo_quads.ply', tmp_dir="C:/tmp"):
-    chdir(filepath)
+              filename='canyon_diablo_quads.ply',
+              tmp_dir="C:/tmp",
+              output_file="S:\\active\\pitfinder\\meshes\\EllipsoidData.js"):
+    tmp_dir = path.join(tmp_dir, datetime.now().strftime('%y%m%d-%H%M%S'))
+    makedirs(tmp_dir)
+    shutil.copy(
+        path.join(filepath, filename),
+        path.join(tmp_dir, filename)
+    )
     subprocess.run([cc_exec_path,
                     '-SILENT',
-                    '-O', path.join(filepath, filename),    # Load input
+                    '-O', path.join(tmp_dir, filename),    # Load input
                     '-C_EXPORT_FMT', 'PLY',                 # Set output to PLY
                     '-PCV',                                 # Do ambient occlusion (Portion de Ciel Visible / ShadeVis)
                         '-N_RAYS', '256',
@@ -41,7 +50,7 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
                     ])
 
     # This is only a second process because of https://github.com/CloudCompare/CloudCompare/issues/847
-    point_cloud_filename = glob(path.join(filepath, filename[:-4] + '*vertices*.ply'))[-1]
+    point_cloud_filename = glob(path.join(tmp_dir, filename[:-4] + '*vertices*.ply'))[-1]
     subprocess.run([cc_exec_path,
                     '-SILENT',
                     '-O', point_cloud_filename,
@@ -49,24 +58,23 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
                     '-FILTER_SF', '0.0', '0.25',
                     '-EXTRACT_CC', '5', '500'
                     ])
-    pit_clouds = glob(path.join(filepath, filename[:-4] + '*vertices*.asc'))
+    pit_clouds = glob(path.join(tmp_dir, filename[:-4] + '*vertices*.asc'))
     ellipsoid_data = []
     for n, pit_cloud in enumerate(pit_clouds):
         pit_cloud_mat = np.loadtxt(pit_cloud)
         # et = EllipsoidTool() # Why is this a class?
         # center, radii, rotation = et.getMinVolEllipse(pit_cloud_mat[:, :3], tolerance=0.1)
-        data_regd = data_regularize(pit_cloud_mat[:, :3], divs=16)
+        data_regd = data_regularize(pit_cloud_mat[:, :3], divs=8)
         center, radii, evecs, v = ellipsoid_fit(data_regd)
         rotation = rotationMatrixToEulerAngles(evecs)
         print("{}, {}, {}".format(center, radii, rotation))
         ellipsoid_data.append({'center': center.tolist(),
                            'radii': radii.tolist(),
                            'rotation': rotation.tolist()})
-    with open('EllipsoidData.js', 'w') as ellipse_file:
-        ellipse_file.write(f'window.ellipses = {ellipsoid_data}')
+        output = json.dumps(ellipsoid_data)
+    with open(output_file, 'w') as ellipse_file:
+        ellipse_file.write(f'window.ellipses = {output}')
         # ctr, radii, evecs, v = ellipsoid_fit(pit_cloud_mat)
 
-pitfinder()
-
-# if __name__ == "__main__":
-#     run(pitfinder)
+if __name__ == "__main__":
+    run(pitfinder)
