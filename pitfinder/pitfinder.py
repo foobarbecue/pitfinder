@@ -31,20 +31,24 @@ def rotationMatrixToEulerAngles(R):
 def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
               filename='canyon_diablo_quads.ply',
               tmp_dir="C:/tmp",
-              output_file="S:\\active\\pitfinder\\meshes\\EllipsoidData.js"):
+              output_file="S:\\active\\pitfinder\\meshes\\EllipsoidData.js",
+              is_closed=False,
+              filter_sf_range=(0, 0.47)
+              ):
     tmp_dir = path.join(tmp_dir, datetime.now().strftime('%y%m%d-%H%M%S'))
     makedirs(tmp_dir)
     shutil.copy(
         path.join(filepath, filename),
         path.join(tmp_dir, filename)
     )
+    is_closed = '-IS_CLOSED' if is_closed else ''
     subprocess.run([cc_exec_path,
                     '-SILENT',
                     '-O', path.join(tmp_dir, filename),    # Load input
                     '-C_EXPORT_FMT', 'PLY',                 # Set output to PLY
                     '-PCV',                                 # Do ambient occlusion (Portion de Ciel Visible / ShadeVis)
                         '-N_RAYS', '256',
-                        '-IS_CLOSED',
+                        is_closed,
                         '-RESOLUTION', '1024',
                     '-EXTRACT_VERTICES'
                     ])
@@ -55,7 +59,7 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
                     '-SILENT',
                     '-O', point_cloud_filename,
                     '-C_EXPORT_FMT', 'ASC',
-                    '-FILTER_SF', '0.0', '0.25',
+                    '-FILTER_SF', filter_sf_range[0], filter_sf_range[1],
                     '-EXTRACT_CC', '5', '500'
                     ])
     pit_clouds = glob(path.join(tmp_dir, filename[:-4] + '*vertices*.asc'))
