@@ -68,7 +68,7 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
         center, radii, evecs, v = ellipsoid_fit(data_regd)
         rotation = rotationMatrixToEulerAngles(evecs)
         print("{}, {}, {}".format(center, radii, rotation))
-        ellipsoid_data.append({'center': center.tolist(),
+        ellipsoid_data.append({'center': center.reshape(3,).tolist(),
                            'radii': radii.tolist(),
                            'rotation': rotation.tolist()})
         output = json.dumps(ellipsoid_data)
