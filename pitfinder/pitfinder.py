@@ -33,7 +33,9 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
               tmp_dir="C:/tmp",
               output_file="S:\\active\\pitfinder\\meshes\\EllipsoidData.js",
               is_closed=False,
-              filter_sf_range=(0, 0.47)
+              filter_sf_range=(0, 0.47),
+              conn_comp_oct_lev=8,
+              conn_comp_min_pts=10,
               ):
     tmp_dir = path.join(tmp_dir, datetime.now().strftime('%y%m%d-%H%M%S'))
     makedirs(tmp_dir)
@@ -60,7 +62,7 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
                     '-O', point_cloud_filename,
                     '-C_EXPORT_FMT', 'ASC',
                     '-FILTER_SF', filter_sf_range[0], filter_sf_range[1],
-                    '-EXTRACT_CC', '5', '500'
+                    '-EXTRACT_CC', conn_comp_oct_lev, conn_comp_min_pts,
                     ])
     pit_clouds = glob(path.join(tmp_dir, filename[:-4] + '*vertices*.asc'))
     ellipsoid_data = []
