@@ -33,9 +33,9 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
               tmp_dir="C:/tmp",
               output_file="S:\\active\\pitfinder\\meshes\\EllipsoidData.js",
               is_closed=False,
-              filter_sf_range=(0, 0.47),
-              conn_comp_oct_lev=8,
-              conn_comp_min_pts=10,
+              filter_sf_range=('0', '0.47'),
+              conn_comp_oct_lev='8',
+              conn_comp_min_pts='10',
               ):
     tmp_dir = path.join(tmp_dir, datetime.now().strftime('%y%m%d-%H%M%S'))
     makedirs(tmp_dir)
@@ -43,15 +43,16 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
         path.join(filepath, filename),
         path.join(tmp_dir, filename)
     )
-    is_closed = '-IS_CLOSED' if is_closed else ''
+    is_closed = '-IS_CLOSED' if is_closed else '-'
     subprocess.run([cc_exec_path,
                     '-SILENT',
                     '-O', path.join(tmp_dir, filename),    # Load input
                     '-C_EXPORT_FMT', 'PLY',                 # Set output to PLY
                     '-PCV',                                 # Do ambient occlusion (Portion de Ciel Visible / ShadeVis)
                         '-N_RAYS', '256',
-                        is_closed,
                         '-RESOLUTION', '1024',
+                        # is_closed,
+                        '-IS_CLOSED',
                     '-EXTRACT_VERTICES'
                     ])
 
