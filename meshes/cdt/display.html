@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>fitpit </title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/100/three.js"></script>
+    <script type="text/javascript" src="./PLYLoader.js"></script>
+    <script type="text/javascript" src="./OrbitControls.js"></script>
+    <script type="text/javascript" src="./EllipsoidData.js"></script>
+
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+	// once everything is loaded, we run our Three.js stuff.
+	function init() {
+
+
+		// create a scene, that will hold all our elements such as objects, cameras and lights.
+		var scene = new THREE.Scene();
+		window.scene = scene;
+
+		// create a camera, which defines where we're looking at.
+		var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+		var controls = new THREE.OrbitControls(camera);
+
+		// create a render and set the size
+		var webGLRenderer = new THREE.WebGLRenderer();
+		webGLRenderer.setSize(window.innerWidth, window.innerHeight);
+		webGLRenderer.shadowMapEnabled = true;
+
+		// position and point the camera to the center of the scene
+		camera.position.x = 10;
+		camera.position.y = 10;
+		camera.position.z = 10;
+		camera.lookAt(new THREE.Vector3(0, -2, 0));
+
+		// add spotlight for the shadows
+		var ambLight = new THREE.HemisphereLight(0xffffff, 0xff0000, 1);
+		ambLight.position.set(20, 20, 20);
+		scene.add(ambLight);
+
+		// add the output of the renderer to the html element
+		document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
+
+
+		var loader = new THREE.PLYLoader();
+		var meteorite = new THREE.Object3D();
+		loader.load("./canyon_diablo_quads.ply", function (geometry) {
+			var material = new THREE.MeshStandardMaterial({
+				color: 0xffffff,
+			});
+
+			meteorite = new THREE.Mesh(geometry, material);
+			meteorite.name = 'meteorite';
+			scene.add(meteorite);
+		});
+        for (let ellipse of ellipses){
+            var sphere_geom = new THREE.SphereGeometry(1, 12, 12);
+            var sphere = new THREE.Mesh(sphere_geom, new THREE.MeshStandardMaterial({
+                color: 'red',
+                wireframe: true
+            }));
+            sphere.position.set(...(ellipse.center));
+            sphere.scale.set(...(ellipse.radii));
+            sphere.setRotationFromEuler(new THREE.Euler(...(ellipse.rotation), 'XYZ'));
+            scene.add(sphere);
+        }
+
+		render();
+
+		function render() {
+
+			if (meteorite) {
+
+				// render using requestAnimationFrame
+				requestAnimationFrame(render);
+				controls.update();
+				webGLRenderer.render(scene, camera);
+			}
+		}
+	}
+
+	window.onload = init;
+</script>
+</body>
+</html>
