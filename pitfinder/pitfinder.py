@@ -7,7 +7,7 @@ import json
 import shutil
 import math
 from datetime import datetime
-from ellipsoid_fit import ellipsoid_fit, data_regularize
+from ellipsoid_fit import ellipsoid_fit
 
 cc_exec_path = 'C:\\Users\\aaron\\CloudCompareProjects\\CloudCompare_debug\\CloudCompare.exe'
 
@@ -52,7 +52,6 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
                         '-N_RAYS', '256',
                         '-RESOLUTION', '1024',
                         # is_closed,
-                        '-IS_CLOSED',
                     '-EXTRACT_VERTICES'
                     ])
 
@@ -61,8 +60,8 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
     subprocess.run([cc_exec_path,
                     '-SILENT',
                     '-O', point_cloud_filename,
-                    '-C_EXPORT_FMT', 'ASC',
                     '-FILTER_SF', filter_sf_range[0], filter_sf_range[1],
+                    '-C_EXPORT_FMT', 'ASC',
                     '-EXTRACT_CC', conn_comp_oct_lev, conn_comp_min_pts,
                     ])
     pit_clouds = glob(path.join(tmp_dir, filename[:-4] + '*vertices*.asc'))
@@ -71,8 +70,7 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
         pit_cloud_mat = np.loadtxt(pit_cloud)
         # et = EllipsoidTool() # Why is this a class?
         # center, radii, rotation = et.getMinVolEllipse(pit_cloud_mat[:, :3], tolerance=0.1)
-        data_regd = data_regularize(pit_cloud_mat[:, :3], divs=8)
-        center, radii, evecs, v = ellipsoid_fit(data_regd)
+        center, evecs, radii = ellipsoid_fit(pit_cloud_mat)
         rotation = rotationMatrixToEulerAngles(evecs)
         print("{}, {}, {}".format(center, radii, rotation))
         ellipsoid_data.append({'center': center.reshape(3,).tolist(),
