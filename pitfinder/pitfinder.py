@@ -72,7 +72,7 @@ def pitfinder(filepath='S:\\active\\pitfinder\\meshes',
         # center, radii, rotation = et.getMinVolEllipse(pit_cloud_mat[:, :3], tolerance=0.1)
         center, evecs, radii = ellipsoid_fit(pit_cloud_mat)
         rotation = rotationMatrixToEulerAngles(evecs)
-        print("{}, {}, {}".format(center, radii, rotation))
+        print("{:.4f}, {:.4f}, {:.4f}".format(center, radii, rotation))
         ellipsoid_data.append({'center': center.reshape(3,).tolist(),
                            'radii': radii.tolist(),
                            'rotation': rotation.tolist()})
